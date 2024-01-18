@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  nodered:
+    image: nodered/node-red
+    environment:
+      - TZ=America/Bogota
+    ports:
+      - "1880:1880"
+    restart: always
+    volumes:
+      - type: bind
+        source: ./nodered_data
+        target: /data
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=database
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./mysql_data
+        target: /var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=mysql
+      - UPLOAD_LIMIT=10000M
+    depends_on:
+      - mysql
